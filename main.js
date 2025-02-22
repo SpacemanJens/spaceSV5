@@ -119,7 +119,7 @@ function generateTowers(count) {
 }
 //s
 function preload() {
-  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5a");
+  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5d");
 
   shared = partyLoadShared("shared", {
     gameObjects: [],  // Start with empty array
@@ -218,11 +218,6 @@ function draw() {
 
   if (detailsLevel.showScoreArea) {
 
-    if (partyIsHost()) {
-      fill('red')
-      text("Host", 30, screenLayout.screenHeight - 30);
-    }
-
     let offSetY = 50;
     textSize(18);
     flights.forEach((flight) => {
@@ -231,6 +226,10 @@ function draw() {
         offSetY += 20
       }
     });
+    if (partyIsHost()) {
+      fill(this.color)
+      text("Host", 20, 30);
+    }
   }
 }
 
@@ -460,7 +459,7 @@ function stepLocal() {
     if (guest) {
       flight.syncFromShared(guest);
     } else {
-      flight.isActive = false;
+      flight.planetIndex = -1;
     }
   });
 

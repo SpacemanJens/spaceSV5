@@ -17,7 +17,8 @@ class Flight {
     }
   
     drawFlight() {
-  
+      if(this.planetIndex < 0) { return;} 
+
       // Calculate relative position based on global coordinates
       let xLocal = this.xLocal - (me.xGlobal - this.xGlobal);
       let yLocal = this.yLocal - (me.yGlobal - this.yGlobal);
@@ -47,6 +48,7 @@ class Flight {
     }
   
     drawBullets() {
+      if(this.planetIndex < 0) { return;} 
       if (this.bullets) {
         this.bullets.forEach(bullet => {
           this.drawBullet(bullet);
@@ -55,6 +57,7 @@ class Flight {
     }
   
     drawBullet(bullet) {
+      if(this.planetIndex < 0) { return;} 
       push();
       fill(this.color);
       imageMode(CENTER);
@@ -72,15 +75,17 @@ class Flight {
     }
   
     draw(playerName, color) {
+      if(this.planetIndex < 0) { return;} 
       fill(color);
       textSize(18)
       if (partyIsHost()) {
-        text("Host", 20, 1180);
+        text("Host", 20, 680);
       }
       text("Me: " + playerName, 20, 30);
     }
   
     drawScore(offSetY) {
+      if(this.planetIndex < 0) { return;} 
       fill(this.color);
       let playerHits = 0;
       for (let i = 0; i < this.hits.length; i++) {
@@ -103,6 +108,7 @@ class Flight {
     }
   
     hitByOtherFlights(flights) {
+      if(this.planetIndex < 0) { return;} 
       let hitByOthers = 0;
       flights.forEach(flight => {
         for (let i = 0; i < flight.hits.length; i++) {
@@ -116,6 +122,8 @@ class Flight {
     }
   
     syncFromShared(sharedFlight) {
+        Object.assign(this, sharedFlight);
+        /*
       this.xLocal = sharedFlight.xLocal; //    Object.assign(this, sharedFlight);
       this.yLocal = sharedFlight.yLocal;
       this.xGlobal = sharedFlight.xGlobal;
@@ -125,6 +133,7 @@ class Flight {
       this.bullets = sharedFlight.bullets;
       this.hits = sharedFlight.hits;
       this.planetIndex = sharedFlight.planetIndex;
+      */
     }
   
     checkBulletCollision(bullet, playerXGlobal, playerYGlobal) {
@@ -302,6 +311,9 @@ class Flight {
     }
   
     syncFromShared(sharedCanon) {
+        Object.assign(this, sharedFlight);
+        /*
+
       this.objectNumber = sharedCanon.objectNumber; //    Object.assign(this, sharedFlight);
       this.objectName = sharedCanon.objectName;
       this.xGlobal = sharedCanon.xGlobal;
@@ -317,6 +329,7 @@ class Flight {
       this.amplitude = sharedCanon.amplitude
       this.speed = sharedCanon.speed
       this.lastShotTime = sharedCanon.lastShotTime
+      */
     }
   }
   
