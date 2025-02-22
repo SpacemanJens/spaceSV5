@@ -48,7 +48,7 @@ const gameConstants = {
 let counter = 0
 let xText = 0;
 let gameObjects = []; // Initialize as empty array
-let canonTowerCount = 15; // Store the previous tower count - Declare here
+let canonTowerCount = 0; // Store the previous tower count - Declare here
 
 let flights = [];
 const playerColors = ['green', 'blue', 'red', 'yellow', 'purple', 'orange', 'pink', 'brown', 'cyan', 'magenta', 'lime', 'teal', 'lavender', 'maroon', 'olive']
