@@ -355,7 +355,7 @@ function moveMe() {
   // Local movement (game area)
   let localOffX = 0;
   let localOffY = 0;
-  const localSpeed = 12;
+  const localSpeed = 3;
   if (keyIsDown(70)) { localOffX = -localSpeed } // F
   if (keyIsDown(72)) { localOffX = localSpeed }  // H
   if (keyIsDown(84)) { localOffY = -localSpeed } // T
