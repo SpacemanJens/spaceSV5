@@ -122,18 +122,15 @@ class Flight {
   }
 
   syncFromShared(sharedFlight) {
-    Object.assign(this, sharedFlight);
-    /*
-  this.xLocal = sharedFlight.xLocal; //    Object.assign(this, sharedFlight);
-  this.yLocal = sharedFlight.yLocal;
-  this.xGlobal = sharedFlight.xGlobal;
-  this.yGlobal = sharedFlight.yGlobal;
-  this.xMouse = sharedFlight.xMouse;
-  this.yMouse = sharedFlight.yMouse;
-  this.bullets = sharedFlight.bullets;
-  this.hits = sharedFlight.hits;
-  this.planetIndex = sharedFlight.planetIndex;
-  */
+    this.xLocal = sharedFlight.xLocal; //    Object.assign(this, sharedFlight);
+    this.yLocal = sharedFlight.yLocal;
+    this.xGlobal = sharedFlight.xGlobal;
+    this.yGlobal = sharedFlight.yGlobal;
+    this.xMouse = sharedFlight.xMouse;
+    this.yMouse = sharedFlight.yMouse;
+    this.bullets = sharedFlight.bullets;
+    this.hits = sharedFlight.hits;
+    this.planetIndex = sharedFlight.planetIndex;
   }
 
   checkBulletCollision(bullet, playerXGlobal, playerYGlobal) {
@@ -281,14 +278,10 @@ class Canon {
       bullet.xGlobal += bulletVector.x * (parseInt(gameConstants.bulletSpeed) * 2);
       bullet.yGlobal += bulletVector.y * (parseInt(gameConstants.bulletSpeed) * 2);
 
-      if (!selectedPlanet.onPlanet(bullet.xGlobal, bullet.yGlobal)) {
+      if (!selectedPlanet.onPlanet(bullet.xGlobal, bullet.yGlobal) || 
+          dist(bullet.xGlobal, bullet.yGlobal, this.xGlobal, this.yGlobal) > 500) {
         this.bullets.splice(i, 1);
       }
-      /*         
-           if (!planet2.onPlanet(bullet.xGlobal, bullet.yGlobal)) {
-             this.bullets.splice(i, 1);
-           }
-             */
     }
   }
 

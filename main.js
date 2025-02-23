@@ -30,7 +30,7 @@ const screenLayout = {
 
 const gameConstants = {
   bulletSpeed: 2,
-  canonTowerShootingInterval: 1000,
+  //canonTowerShootingInterval: 1000,
   diameterFlight: 100, // can be adjusted
   diameterBullet: 15,
   minimapMarkerDiamter: 10,
@@ -47,7 +47,7 @@ let meHost = false;
 let counter = 0
 let xText = 0;
 let gameObjects = []; // Initialize as empty array
-let canonTowerCount = 5; // Store the previous tower count - Declare here
+//let canonTowerCount = 5; // Store the previous tower count - Declare here
 
 let flights = [];
 let activeFlights = [];
@@ -81,7 +81,7 @@ function onLocalScreenArea(xLocal, yLocal) {
 }
 
 function updateTowerCount() {
-  gameObjects = generateTowers(canonTowerCount);
+  gameObjects = generateTowers(shared.canonTowerCount);
   shared.gameObjects = gameObjects.map(tower => ({
     xGlobal: tower.xGlobal,
     yGlobal: tower.yGlobal,
@@ -125,6 +125,8 @@ function preload() {
   shared = partyLoadShared("shared", {
     gameObjects: [],  // Start with empty array
     canonTowerHits: Array(15).fill(0),
+    canonTowerCount: 3,
+    canonTowerShootingInterval: 1000,
   });
   me = partyLoadMyShared({ playerName: "observer" });
   guests = partyLoadGuestShareds();
@@ -265,18 +267,24 @@ function draw() {
   offSetY += 20;
   text("Number of visible bullets: " + numberOfVisualBullets, 20, offSetY);
   offSetY += 40;
-  text("Performance controls:"  , 20, offSetY);
+  text("Performance controls:", 20, offSetY);
   offSetY += 20;
-  text("Key p: show star system "  , 20, offSetY);
+  text("Key p: show star system ", 20, offSetY);
   offSetY += 20;
-  text("Key o: show detailed minimap "  , 20, offSetY);
+  text("Key o: show detailed minimap ", 20, offSetY);
   offSetY += 20;
-  text("Key i: show background starts "  , 20, offSetY);
+  text("Key i: show background starts ", 20, offSetY);
   offSetY += 20;
-  text("Key 9, 8, 7, 6: NoOfCanons 18, 9, 3, 0 "  , 20, offSetY);
+  text("Key m: Expand game area right ", 20, offSetY);
   offSetY += 20;
-  text("Key l, k, j h: Shooting interval 200, 500, 1000, 2000"  , 20, offSetY);
+  text("Key n: Expand game area down ", 20, offSetY);
   offSetY += 20;
+  if (partyIsHost()) {
+    text("Key 9, 8, 7, 6: NoOfCanons 18, 9, 3, 0 ", 20, offSetY);
+    offSetY += 20;
+    text("Key l, k, j h: Shooting interval 200, 500, 1000, 2000", 20, offSetY);
+    offSetY += 20;
+  }
 }
 
 function keyPressed() {
@@ -296,45 +304,47 @@ function keyPressed() {
     detailsLevel.showStarPlanetImages = !detailsLevel.showStarPlanetImages;
   }
   if (partyIsHost() && keyCode === 57) { // 9
-    canonTowerCount = 18;
+    shared.canonTowerCount = 18;
     updateTowerCount();
   }
   if (partyIsHost() && keyCode === 56) { // 8
-    canonTowerCount = 9;
+    shared.canonTowerCount = 9;
     updateTowerCount();
   }
   if (partyIsHost() && keyCode === 55) { // 7
-    canonTowerCount = 3;
+    shared.canonTowerCount = 3;
     updateTowerCount();
   }
   if (partyIsHost() && keyCode === 54) { // 6
-    canonTowerCount = 0;
+    shared.canonTowerCount = 0;
     updateTowerCount();
   }
   if (partyIsHost() && keyCode === 76) { // l
-    gameConstants.canonTowerShootingInterval = 200;
+    shared.canonTowerShootingInterval = 200;
   }
   if (partyIsHost() && keyCode === 75) { // k
-    gameConstants.canonTowerShootingInterval = 500;
+    shared.canonTowerShootingInterval = 500;
   }
   if (partyIsHost() && keyCode === 74) { // j
-    gameConstants.canonTowerShootingInterval = 1000;
+    shared.canonTowerShootingInterval = 1000;
   }
   if (partyIsHost() && keyCode === 73) { // h
-    gameConstants.canonTowerShootingInterval = 2000;
+    shared.canonTowerShootingInterval = 2000;
   }
-  if (partyIsHost() && keyCode === 77) { // m
-     if (screenLayout.cropWidth === 1200) {
-      screenLayout.cropWidth = 1600;  
+  if (keyCode === 77) { // m
+    if (screenLayout.cropWidth === 1200) {
+      screenLayout.cropWidth = 1600;
     } else {
       screenLayout.cropWidth = 1200;
     }
   }
-  if (partyIsHost() && keyCode === 78) { // 78
+  if (keyCode === 78) { // n
     if (screenLayout.cropHeight === 700) {
-      screenLayout.cropHeight = 1100;  
+      screenLayout.cropHeight = 1100;
+      showStarSystem = false
     } else {
       screenLayout.cropHeight = 700;
+      showStarSystem = true
     }
   }
 }
@@ -346,7 +356,7 @@ function performHostAction() {
 
     const currentTime = millis();
     //        const selectedInterval = gameConstants.shootingIntervals[shootingIntervalSelect.value()];
-    const selectedInterval = gameConstants.canonTowerShootingInterval;
+    const selectedInterval = shared.canonTowerShootingInterval;
     // Check if selectedInterval is a valid number
     if (typeof selectedInterval === 'number') {
       if (currentTime - canon.lastShotTime > selectedInterval) {
