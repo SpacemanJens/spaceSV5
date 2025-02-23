@@ -4,26 +4,25 @@ let shared;
 
 let planet
 let solarSystem;
-let planet2
+let selectedPlanet
 let backgroundStarsManager;
 let flightImages = [];
 let minimapImg = [];
 
 const detailsLevel = {
-  showScoreArea: true,
-  showGameArea: true,
+  showStarSystem: true,
   showPlanet: true,
-  showStarSystem: false,
- 
-  showGraphics: true,
+  showBackroundStarts: true,
+  showGameAreaImage: true,
+  showStarPlanetImages: true
 }
 
 const screenLayout = {
   screenWidth: 2400, // 2400
-  screenHeight: 1400, // 1200
+  screenHeight: 1200, // 1200
   startPlanetIndex: 3,
   diameterPlanet: 3800, //3838,  // 1500/3838 Must be the same as the actual size of the background image found in preload()
-  cropWidth: 700, // 1800
+  cropWidth: 1200, // 1800
   cropHeight: 700, // 1200
   xGameArea: 600,
   yGameArea: 50,
@@ -31,8 +30,8 @@ const screenLayout = {
 
 const gameConstants = {
   bulletSpeed: 2,
-  canonTowerShootingInterval: 2100,
-  diameterFlight: 200, // can be adjusted
+  canonTowerShootingInterval: 1000,
+  diameterFlight: 100, // can be adjusted
   diameterBullet: 15,
   minimapMarkerDiamter: 10,
   shootingIntervals: {
@@ -44,13 +43,14 @@ const gameConstants = {
     'Very Slow (3s)': 3000
   }
 }
-
+let meHost = false;
 let counter = 0
 let xText = 0;
 let gameObjects = []; // Initialize as empty array
-let canonTowerCount = 1; // Store the previous tower count - Declare here
+let canonTowerCount = 5; // Store the previous tower count - Declare here
 
 let flights = [];
+let activeFlights = [];
 const playerColors = ['green', 'blue', 'red', 'yellow', 'purple', 'orange', 'pink', 'brown', 'cyan', 'magenta', 'lime', 'teal', 'lavender', 'maroon', 'olive']
 
 
@@ -66,6 +66,7 @@ function setup() {
   createFlights();
 
   if (partyIsHost()) {
+    meHost = true;
     updateTowerCount();
   }
 
@@ -96,7 +97,7 @@ function updateTowerCount() {
 
 function generateTowers(count) {
   const towers = [];
-  const radius = screenLayout.diameterPlanet / 6; // Distance from center 
+  const radius = screenLayout.diameterPlanet / 12; // Distance from center 
   const angleStep = (2 * PI) / count;
 
   for (let i = 0; i < count; i++) {
@@ -119,7 +120,7 @@ function generateTowers(count) {
 }
 //s
 function preload() {
-  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5d");
+  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5f");
 
   shared = partyLoadShared("shared", {
     gameObjects: [],  // Start with empty array
@@ -138,23 +139,32 @@ function preload() {
   }
 
   minimapImage = loadImage(`images/bgLavaMinimap.png`);
-//  minimapNightImage = loadImage(`images/background/bgMinimapNight.png`);
-//  minimapHotImage = loadImage(`images/background/bgMinimapHot.png`);
+  //  minimapNightImage = loadImage(`images/background/bgMinimapNight.png`);
+  //  minimapHotImage = loadImage(`images/background/bgMinimapHot.png`);
   //  backgroundImage = loadImage("images/background/bgLava3500.png");
-//  backgroundImage = loadImage("images/bgLava1500.png");
+  //  backgroundImage = loadImage("images/bgLava1500.png");
   backgroundImage = loadImage("images/planetA/planetA.png"); // Circle 3838, Image 4000
-//  backgroundImage = loadImage("images/planetA/planetAGlowingV1.png");// Circle 3838, Image 4000
+  //  backgroundImage = loadImage("images/planetA/planetAGlowingV1.png");// Circle 3838, Image 4000
   //  backgroundImage = loadImage("images/background/bgLava.png");
-//  backgroundNightImage = loadImage("images/background/bgNight.png");
-//  backgroundHotImage = loadImage("images/background/bgHot.png");
+  //  backgroundNightImage = loadImage("images/background/bgNight.png");
+  //  backgroundHotImage = loadImage("images/background/bgHot.png");
 }
 
 function draw() {
 
-  planet2 = solarSystem.planets[me.planetIndex];
+  console.log("draw " + meHost + " " + partyIsHost())
+  if (!meHost && partyIsHost()) {
+    console.log(shared.canonTowerHits)
+    meHost = true;
+    updateTowerCount();
+  }
+
+  selectedPlanet = solarSystem.planets[me.planetIndex];
+  activeFlights = flights.filter(f => f.planetIndex >= 0); // Only target visible flights - changed filter
+  //angleMode(DEGREES);
+  //angleMode(RADIANS);
 
 
-  angleMode(RADIANS);
 
   // Handle updates
   stepLocal();
@@ -165,7 +175,7 @@ function draw() {
     receiveNewDataFromHost()
   }
 
-  if (detailsLevel.showGraphics) {
+  if (detailsLevel.showBackroundStarts) {
     backgroundStarsManager.move();
   }
 
@@ -178,57 +188,146 @@ function draw() {
   // Draw screen
   background(0);
 
-  if (detailsLevel.showGraphics) {
+  if (detailsLevel.showBackroundStarts) {
     backgroundStarsManager.show();
   }
 
-  push();
-  angleMode(DEGREES);
+  if (detailsLevel.showStarSystem) {
+    push();
+    angleMode(DEGREES);
 
-  solarSystem.update();
-  solarSystem.draw();
-  pop()
-
-  flights.forEach((flight) => {
-    if (flight.planetIndex >= 0) {
-      planet2.drawFlight(flight);
-    }
-  });
-
-  if (detailsLevel.showGameArea) {
-    drawGameArea()
+    solarSystem.update();
+    solarSystem.draw();
+    pop()
+    activeFlights.forEach((flight) => {
+      if (flight.planetIndex >= 0) {
+        selectedPlanet.drawFlight(flight);
+      }
+    });
   }
+  angleMode(RADIANS);
+
+  drawGameArea()
 
   if (detailsLevel.showPlanet) {
     planet.draw();
 
-    flights.forEach((flight) => {
+    activeFlights.forEach((flight) => {
       if (flight.planetIndex >= 0) {
         planet.drawObject(flight.xGlobal + flight.xLocal, flight.yGlobal + flight.yLocal, gameConstants.minimapMarkerDiamter, flight.color);
       }
     });
-
-    // Draw Canon Towers for all players
-    gameObjects.forEach(canon => {
-      canon.drawCanonTower();
-      canon.drawBullets();
-      canon.drawScore();
-    });
   }
 
-  if (detailsLevel.showScoreArea) {
+  // Draw Canon Towers for all players
+  gameObjects.forEach(canon => {
+    canon.drawCanonTower();
+    canon.drawBullets();
+    canon.drawScore();
+  });
 
-    let offSetY = 50;
-    textSize(18);
-    flights.forEach((flight) => {
-      if (flight.planetIndex >= 0) {
-        flight.drawScore(offSetY)
-        offSetY += 20
+  let offSetY = 500;
+  if (partyIsHost()) {
+    fill('gray')
+    text("Host", 20, offSetY);
+    offSetY += 20
+  }
+  textSize(18);
+  let numberOfBullets = 0;
+  let numberOfVisualBullets = 0;
+
+  // Count visible bullets from flights
+  activeFlights.forEach((flight) => {
+    if (flight.planetIndex >= 0) {
+      flight.drawScore(offSetY);
+      offSetY += 20;
+      numberOfBullets += flight.bullets.length;
+      // Count visible bullets
+      flight.bullets.forEach(bullet => {
+        let xLocal = bullet.xLocal - (me.xGlobal - bullet.xGlobal);
+        let yLocal = bullet.yLocal - (me.yGlobal - bullet.yGlobal);
+        if (onLocalScreenArea(xLocal, yLocal)) {
+          numberOfVisualBullets++;
+        }
+      });
+    }
+  });
+
+  // Count visible bullets from canons
+  gameObjects.forEach(canon => {
+    numberOfBullets += canon.bullets.length;
+    // Count visible bullets
+    canon.bullets.forEach(bullet => {
+      let xLocal = bullet.xGlobal - me.xGlobal;
+      let yLocal = bullet.yGlobal - me.yGlobal;
+      if (onLocalScreenArea(xLocal, yLocal)) {
+        numberOfVisualBullets++;
       }
     });
-    if (partyIsHost()) {
-      fill(this.color)
-      text("Host", 20, 30);
+  });
+
+  fill('gray');
+  text("Total number of bullets: " + numberOfBullets, 20, offSetY);
+  offSetY += 20;
+  text("Number of visible bullets: " + numberOfVisualBullets, 20, offSetY);
+}
+
+function keyPressed() {
+  if (keyCode === 80) { // p
+    detailsLevel.showStarSystem = !detailsLevel.showStarSystem;
+  }
+  if (keyCode === 79) { // o
+    detailsLevel.showPlanet = !detailsLevel.showPlanet;
+  }
+  if (keyCode === 73) { // i
+    detailsLevel.showBackroundStarts = !detailsLevel.showBackroundStarts;
+  }
+  if (keyCode === 85) { // u
+    detailsLevel.showGameAreaImage = !detailsLevel.showGameAreaImage;
+  }
+  if (keyCode === 89) { // y
+    detailsLevel.showStarPlanetImages = !detailsLevel.showStarPlanetImages;
+  }
+  if (partyIsHost() && keyCode === 57) { // 9
+    canonTowerCount = 18;
+    updateTowerCount();
+  }
+  if (partyIsHost() && keyCode === 56) { // 8
+    canonTowerCount = 18;
+    updateTowerCount();
+  }
+  if (partyIsHost() && keyCode === 55) { // 7
+    canonTowerCount = 3;
+    updateTowerCount();
+  }
+  if (partyIsHost() && keyCode === 54) { // 6
+    canonTowerCount = 0;
+    updateTowerCount();
+  }
+  if (partyIsHost() && keyCode === 76) { // l
+    gameConstants.canonTowerShootingInterval = 200;
+  }
+  if (partyIsHost() && keyCode === 75) { // k
+    gameConstants.canonTowerShootingInterval = 500;
+  }
+  if (partyIsHost() && keyCode === 74) { // j
+    gameConstants.canonTowerShootingInterval = 1000;
+  }
+  if (partyIsHost() && keyCode === 73) { // h
+    gameConstants.canonTowerShootingInterval = 2000;
+  }
+  if (partyIsHost() && keyCode === 77) { // m
+     if (screenLayout.cropWidth === 1200) {
+      screenLayout.cropWidth = 1600;  
+    } else {
+      screenLayout.cropWidth = 1200;
+    }
+  }
+  if (partyIsHost() && keyCode === 78) { // 78
+    if (screenLayout.cropHeight === 700) {
+      screenLayout.cropHeight = 1100;  
+    } else {
+      screenLayout.cropHeight = 700;
     }
   }
 }
@@ -244,9 +343,8 @@ function performHostAction() {
     // Check if selectedInterval is a valid number
     if (typeof selectedInterval === 'number') {
       if (currentTime - canon.lastShotTime > selectedInterval) {
-        const activeFlights = flights.filter(f => f.planetIndex >= 0); // Only target visible flights - changed filter
         if (activeFlights.length > 0) {
-          const nearestFlight = canon.findNearestFlight(activeFlights);
+          const nearestFlight = canon.findNearestFlight();
 
           if (nearestFlight) {
             canon.shoot(nearestFlight);
@@ -259,7 +357,7 @@ function performHostAction() {
     }
 
     canon.moveBullets(); // Move bullets before drawing
-    canon.checkCollisionsWithFlights(flights);  // Add this line
+    canon.checkCollisionsWithFlights();  // Add this line
 
     // Sync to shared state
     shared.gameObjects[index] = {
@@ -320,7 +418,7 @@ function receiveNewDataFromHost() {
 
 function drawGameArea() {
 
-  if (detailsLevel.showGraphics) {
+  if (detailsLevel.showGameAreaImage) {
     let cropX = me.xGlobal;
     let cropY = me.yGlobal;
     // Scale the background image to match planet size
@@ -338,11 +436,12 @@ function drawGameArea() {
     //    noFill();
     fill('grey')
     circle(screenLayout.xGameArea - me.xGlobal + planet.diameterPlanet / 2, screenLayout.yGameArea - me.yGlobal + planet.diameterPlanet / 2, planet.diameterPlanet);
-    fill('black ')
+    fill('black')
+    rect(0, 0, screenLayout.xGameArea, screenLayout.screenHeight);
     rect(screenLayout.xGameArea + screenLayout.cropWidth, 0, screenLayout.screenWidth, screenLayout.screenHeight);
     rect(0, screenLayout.yGameArea + screenLayout.cropHeight, screenLayout.screenWidth, screenLayout.screenWidth);
   }
-  flights.forEach((flight) => {
+  activeFlights.forEach((flight) => {
     if (flight.planetIndex >= 0) {
       flight.drawFlight();
       flight.drawBullets()
@@ -382,20 +481,20 @@ function moveMe() {
   newxGlobal = constrain(newxGlobal, 0, planet.diameterPlanet);
   newyGlobal = constrain(newyGlobal, 0, planet.diameterPlanet);
 
-  if (planet2.onPlanet(xTemp + newxGlobal, yTemp + newyGlobal)) {
+  if (selectedPlanet.onPlanet(xTemp + newxGlobal, yTemp + newyGlobal)) {
     me.xGlobal = newxGlobal;
     me.yGlobal = newyGlobal;
     me.xLocal = xTemp;
     me.yLocal = yTemp;
   }
-/*
-  if (planet.isOnPlanet(xTemp + newxGlobal, yTemp + newyGlobal)) {
-    me.xGlobal = newxGlobal;
-    me.yGlobal = newyGlobal;
-    me.xLocal = xTemp;
-    me.yLocal = yTemp;
-  }
-    */
+  /*
+    if (planet.isOnPlanet(xTemp + newxGlobal, yTemp + newyGlobal)) {
+      me.xGlobal = newxGlobal;
+      me.yGlobal = newyGlobal;
+      me.xLocal = xTemp;
+      me.yLocal = yTemp;
+    }
+      */
 
   me.xMouse = mouseX - screenLayout.xGameArea;
   me.yMouse = mouseY - screenLayout.yGameArea;
@@ -414,9 +513,13 @@ function moveMe() {
     bullet.xGlobal += bulletVector.x * parseInt(gameConstants.bulletSpeed);
     bullet.yGlobal += bulletVector.y * parseInt(gameConstants.bulletSpeed);
 
+    let xLocalTemp = bullet.xLocal - (me.xGlobal - bullet.xGlobal);
+    let yLocalTemp = bullet.yLocal - (me.yGlobal - bullet.yGlobal);
+
     // Remove bullet if it's not on the screen seen from the flight shooting it
-    if (!planet.isOnPlanet(bullet.xLocal + bullet.xGlobal, bullet.yLocal + bullet.yGlobal)
-      || !onLocalScreenArea(bullet.xLocal, bullet.yLocal)) {
+    if (!selectedPlanet.onPlanet(bullet.xLocal + bullet.xGlobal, bullet.yLocal + bullet.yGlobal)
+
+      || !onLocalScreenArea(xLocalTemp, yLocalTemp)) {
       me.bullets.splice(i, 1);
     }
   }
@@ -424,7 +527,7 @@ function moveMe() {
 
 function checkCollisions() {
 
-  flights.forEach((flight) => {
+  activeFlights.forEach((flight) => {
     if (flight.playerName != me.playerName) {
       checkCollisionsWithFlight(flight);
     }
@@ -490,9 +593,9 @@ function createFlights() {
       playerNumber: i,
       playerName: "player" + i,
       teamNumber: 0,
-      xLocal: screenLayout.cropWidth / 2,
+      xLocal: screenLayout.cropWidth / 2 + 100,
       yLocal: screenLayout.cropHeight / 2,
-      xGlobal: screenLayout.diameterPlanet / 2 - screenLayout.cropWidth / 2,
+      xGlobal: screenLayout.diameterPlanet / 2 - screenLayout.cropWidth / 2 + 400,
       yGlobal: screenLayout.diameterPlanet / 2 - screenLayout.cropHeight / 2,
       diameter: gameConstants.diameterFlight,
       xMouse: 0,
