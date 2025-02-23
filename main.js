@@ -282,7 +282,7 @@ function draw() {
   if (partyIsHost()) {
     text("Key 9, 8, 7, 6: NoOfCanons 18, 9, 3, 0 ", 20, offSetY);
     offSetY += 20;
-    text("Key l, k, j h: Shooting interval 200, 500, 1000, 2000", 20, offSetY);
+    text("Key l, k, j: Shooting interval 500, 1000, 2000", 20, offSetY);
     offSetY += 20;
   }
 }
@@ -320,15 +320,12 @@ function keyPressed() {
     updateTowerCount();
   }
   if (partyIsHost() && keyCode === 76) { // l
-    shared.canonTowerShootingInterval = 200;
-  }
-  if (partyIsHost() && keyCode === 75) { // k
     shared.canonTowerShootingInterval = 500;
   }
-  if (partyIsHost() && keyCode === 74) { // j
+  if (partyIsHost() && keyCode === 75) { // k
     shared.canonTowerShootingInterval = 1000;
   }
-  if (partyIsHost() && keyCode === 73) { // h
+  if (partyIsHost() && keyCode === 74) { // j
     shared.canonTowerShootingInterval = 2000;
   }
   if (keyCode === 77) { // m
@@ -587,7 +584,7 @@ function stepLocal() {
 
 function mousePressed() {
 
-  if (me.playerName === "observer")
+  if (me.playerName === "observer"|| me.bullets.length > 5)
     return
 
   let bullet = {
@@ -655,4 +652,3 @@ function spawn(flight) {
   me.hits = Array(15).fill(0)
   me.planetIndex = screenLayout.startPlanetIndex;
 }
-
