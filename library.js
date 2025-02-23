@@ -432,14 +432,11 @@ class Planet extends CelestialObject {
           this.i++;
         }
       }
-      //    console.log(this.i);
     } else {
 
       fill(this.color[0], this.color[1], this.color[2]);
       noStroke();
       circle(this.x, this.y, this.size);
-      //    fill('yellow');
-      //    circle(this.x, this.y, this.baseSize);
     }
   }
   onPlanet(xF, yF) {
@@ -447,17 +444,12 @@ class Planet extends CelestialObject {
     let posY = map(this.size / 2, 0, this.size, 0, this.diameterPlanet);
 
     let distance = dist(xF, yF, posX, posY);
-    //    console.log(int(distance));
-    //    mainCanvas.fill(255)
-    //    mainCanvas.text("Distance: " + distance, mouseX, mouseY + 40);
     let dMapped = map(this.size, 0, this.size, 0, this.diameterPlanet);
-    //console.log(int(dMapped));
     return distance < dMapped / 2;  // Return true if the point is inside the planet        
   }
 
   drawFlight(flight) {
     //  fill('yellow')
-    //  circle(this.x + solarSystem.x, this.y + solarSystem.y, 6);
     //    fill(flight.color);
     fill('red');
     let posX = solarSystem.x + this.x + map(flight.xGlobal + flight.xLocal, 0, this.diameterPlanet, 0, this.size);

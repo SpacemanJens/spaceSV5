@@ -152,19 +152,13 @@ function preload() {
 
 function draw() {
 
-  console.log("draw " + meHost + " " + partyIsHost())
   if (!meHost && partyIsHost()) {
-    console.log(shared.canonTowerHits)
     meHost = true;
     updateTowerCount();
   }
 
   selectedPlanet = solarSystem.planets[me.planetIndex];
   activeFlights = flights.filter(f => f.planetIndex >= 0); // Only target visible flights - changed filter
-  //angleMode(DEGREES);
-  //angleMode(RADIANS);
-
-
 
   // Handle updates
   stepLocal();
@@ -270,6 +264,19 @@ function draw() {
   text("Total number of bullets: " + numberOfBullets, 20, offSetY);
   offSetY += 20;
   text("Number of visible bullets: " + numberOfVisualBullets, 20, offSetY);
+  offSetY += 40;
+  text("Performance controls:"  , 20, offSetY);
+  offSetY += 20;
+  text("Key p: show star system "  , 20, offSetY);
+  offSetY += 20;
+  text("Key o: show detailed minimap "  , 20, offSetY);
+  offSetY += 20;
+  text("Key i: show background starts "  , 20, offSetY);
+  offSetY += 20;
+  text("Key 9, 8, 7, 6: NoOfCanons 18, 9, 3, 0 "  , 20, offSetY);
+  offSetY += 20;
+  text("Key l, k, j h: Shooting interval 200, 500, 1000, 2000"  , 20, offSetY);
+  offSetY += 20;
 }
 
 function keyPressed() {
@@ -293,7 +300,7 @@ function keyPressed() {
     updateTowerCount();
   }
   if (partyIsHost() && keyCode === 56) { // 8
-    canonTowerCount = 18;
+    canonTowerCount = 9;
     updateTowerCount();
   }
   if (partyIsHost() && keyCode === 55) { // 7
