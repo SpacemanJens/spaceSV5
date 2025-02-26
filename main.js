@@ -8,6 +8,9 @@ let selectedPlanet
 let backgroundStarsManager;
 let flightImages = [];
 let minimapImg = [];
+let imagesLoaded = 0; // Counter to track loaded images
+//let totalImages = 778;
+let totalImages = 805;
 
 const detailsLevel = {
   showStarSystem: true,
@@ -31,7 +34,7 @@ const screenLayout = {
 const gameConstants = {
   bulletSpeed: 2,
   //canonTowerShootingInterval: 1000,
-  diameterFlight: 100, // can be adjusted
+  diameterFlight: 200, // can be adjusted
   diameterBullet: 15,
   minimapMarkerDiamter: 10,
   shootingIntervals: {
@@ -53,7 +56,9 @@ let flights = [];
 let activeFlights = [];
 const playerColors = ['green', 'blue', 'red', 'yellow', 'purple', 'orange', 'pink', 'brown', 'cyan', 'magenta', 'lime', 'teal', 'lavender', 'maroon', 'olive']
 
-
+function imageLoaded() {
+  imagesLoaded++; // Increase count when an image is loaded
+}
 function setup() {
   createCanvas(screenLayout.screenWidth, screenLayout.screenHeight);
 
@@ -120,7 +125,7 @@ function generateTowers(count) {
 }
 //s
 function preload() {
-  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5g");
+  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5j2");
 
   shared = partyLoadShared("shared", {
     gameObjects: [],  // Start with empty array
@@ -135,10 +140,16 @@ function preload() {
     flightImages[i] = loadImage(`images/flight/flight${i}.png`);
     //    flightImages[i] = loadImage(`images/boss1.png`);
   }
+  for (let i = 0; i < totalImages; i++) {
+    minimapImg[i] = loadImage(`images/planetA/planetAminimap2/planetA_${i}.png`, imageLoaded);
+    //minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`, imageLoaded);
+  }
+ 
+  /*
   for (let i = 0; i < 778; i++) {
 
     minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`);
-  }
+  }*/
 
   minimapImage = loadImage(`images/bgLavaMinimap.png`);
   //  minimapNightImage = loadImage(`images/background/bgMinimapNight.png`);
@@ -188,7 +199,7 @@ function draw() {
     backgroundStarsManager.show();
   }
 
-  if (detailsLevel.showStarSystem) {
+  if (detailsLevel.showStarSystem && imagesLoaded === totalImages) {
     push();
     angleMode(DEGREES);
 
@@ -288,6 +299,19 @@ function draw() {
 }
 
 function keyPressed() {
+
+  if (keyCode === 49) { // 1
+    me.planetIndex = 0;
+  } else if (keyCode === 50) { // 2
+    me.planetIndex = 1;
+  } else if (keyCode === 51) { // 3
+    me.planetIndex = 2;
+  } else if (keyCode === 52) { // 4
+    me.planetIndex = 3;
+  } else if (keyCode === 53) { // 5
+    me.planetIndex = 4;
+  }
+
   if (keyCode === 80) { // p
     detailsLevel.showStarSystem = !detailsLevel.showStarSystem;
   }
@@ -584,7 +608,7 @@ function stepLocal() {
 
 function mousePressed() {
 
-  if (me.playerName === "observer"|| me.bullets.length > 5)
+  if (me.playerName === "observer" || me.bullets.length > 5)
     return
 
   let bullet = {

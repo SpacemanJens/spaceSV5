@@ -278,8 +278,8 @@ class Canon {
       bullet.xGlobal += bulletVector.x * (parseInt(gameConstants.bulletSpeed) * 2);
       bullet.yGlobal += bulletVector.y * (parseInt(gameConstants.bulletSpeed) * 2);
 
-      if (!selectedPlanet.onPlanet(bullet.xGlobal, bullet.yGlobal) || 
-          dist(bullet.xGlobal, bullet.yGlobal, this.xGlobal, this.yGlobal) > 500) {
+      if (!selectedPlanet.onPlanet(bullet.xGlobal, bullet.yGlobal) ||
+        dist(bullet.xGlobal, bullet.yGlobal, this.xGlobal, this.yGlobal) > 500) {
         this.bullets.splice(i, 1);
       }
     }
@@ -414,17 +414,15 @@ class Planet extends CelestialObject {
 
   draw() {
     if (detailsLevel.showStarPlanetImages) {
-      image(minimapImg[this.i], this.x, this.y, this.size, this.size);
-      //image(minimapImage, this.xMinimap - this.diameterMinimap / 2, this.yMinimap - this.diameterMinimap / 2, this.diameterMinimap, this.diameterMinimap);
 
-      if (this.i === 777) {
+      if (frameCount % 3 === 0) {
+        this.i++;
+      }
+      if (this.i === totalImages) {
         this.i = 0;
       }
-      else {
-        if (frameCount % 3 === 0) {
-          this.i++;
-        }
-      }
+      image(minimapImg[this.i], this.x, this.y, this.size, this.size);
+      //image(minimapImage, this.xMinimap - this.diameterMinimap / 2, this.yMinimap - this.diameterMinimap / 2, this.diameterMinimap, this.diameterMinimap);
     } else {
 
       fill(this.color[0], this.color[1], this.color[2]);
