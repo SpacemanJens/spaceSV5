@@ -9,6 +9,7 @@ let backgroundStarsManager;
 let flightImages = [];
 let minimapImg = [];
 let imagesLoaded = 0; // Counter to track loaded images
+
 //let totalImages = 778;
 let totalImages = 805;
 
@@ -62,6 +63,12 @@ function imageLoaded() {
 function setup() {
   createCanvas(screenLayout.screenWidth, screenLayout.screenHeight);
 
+  for (let i = 0; i < totalImages; i++) {
+
+        minimapImg[i] = loadImage(`images/planetA/planetAminimap2/planetA_${i}.png`, imageLoaded);
+    //    minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`, imageLoaded);
+      }
+    
   planet = new BasicMinimap(x = 250, y = 250, diameter = 300, color = 'grey', diameterPlanet = screenLayout.diameterPlanet);
 
   solarSystem = new SolarSystem(xSolarSystemCenter = 1250, ySolarSystemCenter = 900);
@@ -140,11 +147,12 @@ function preload() {
     flightImages[i] = loadImage(`images/flight/flight${i}.png`);
     //    flightImages[i] = loadImage(`images/boss1.png`);
   }
+  /*
   for (let i = 0; i < totalImages; i++) {
     minimapImg[i] = loadImage(`images/planetA/planetAminimap2/planetA_${i}.png`, imageLoaded);
     //minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`, imageLoaded);
   }
- 
+ */
   /*
   for (let i = 0; i < 778; i++) {
 
