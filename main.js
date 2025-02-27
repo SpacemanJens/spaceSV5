@@ -97,7 +97,7 @@ function imageLoaded() {
 function setup() {
   createCanvas(screenLayout.screenWidth, screenLayout.screenHeight);
 
-  loadFrames()
+  //loadFrames()
 /*
   for (let i = 0; i < totalImages; i++) {
 
