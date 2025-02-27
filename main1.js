@@ -97,7 +97,7 @@ function imageLoaded() {
 function setup() {
   createCanvas(screenLayout.screenWidth, screenLayout.screenHeight);
 
-  //loadFrames()
+  loadFrames()
 /*
   for (let i = 0; i < totalImages; i++) {
 
@@ -227,10 +227,8 @@ function draw() {
   stepLocal();
 
   if (partyIsHost()) {
-    console.log("Host action");
     performHostAction()
   } else {
-    console.log("Non Host action");
     receiveNewDataFromHost()
   }
 
