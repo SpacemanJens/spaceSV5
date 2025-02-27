@@ -8,10 +8,13 @@ let selectedPlanet
 let backgroundStarsManager;
 let flightImages = [];
 let minimapImg = [];
+let minimapStillImg = [];
 let imagesLoaded = 0; // Counter to track loaded images
+let totalNumberOfPlanets = 5;
 
 //let totalImages = 778;
 let totalImages = 805;
+let animationReady = false;
 
 const detailsLevel = {
   showStarSystem: true,
@@ -52,22 +55,55 @@ let counter = 0
 let xText = 0;
 let gameObjects = []; // Initialize as empty array
 //let canonTowerCount = 5; // Store the previous tower count - Declare here
+let batchSize = 50; // Number of images to load per batch
+let batchIndex = 0; // Keeps track of which batch is loading
+let framesLoaded = 0;
 
 let flights = [];
 let activeFlights = [];
 const playerColors = ['green', 'blue', 'red', 'yellow', 'purple', 'orange', 'pink', 'brown', 'cyan', 'magenta', 'lime', 'teal', 'lavender', 'maroon', 'olive']
 
-function imageLoaded() {
-  imagesLoaded++; // Increase count when an image is loaded
+function loadFrames() {
+  loadNextBatch(); // Start batch loading
 }
+
+function loadNextBatch() {
+  let start = batchIndex * batchSize;
+  let end = Math.min(start + batchSize, totalImages); // Prevent out-of-bounds
+
+  console.log(`Loading frames ${start} to ${end - 1}`);
+
+  for (let i = start; i < end; i++) {
+    minimapImg[i] = loadImage(`images/planetA/planetAminimap2/planetA_${i}.png`, imageLoaded);
+//    frames[i] = loadImage(`https://spacemanjens.github.io/spaceSV5/images/planetA/frames/frame_${i}.png`, imageLoaded);
+  }
+
+  batchIndex++;
+
+  // If more images remain, load the next batch after a short delay
+  if (batchIndex * batchSize < totalImages) {
+    setTimeout(loadNextBatch, 300); // Delay of 300ms before next batch
+  }
+}
+
+function imageLoaded() {
+  imagesLoaded++;
+  if (imagesLoaded === totalImages) {
+    animationReady = true;
+    console.log("All images loaded! Starting animation...");
+  }
+}
+
 function setup() {
   createCanvas(screenLayout.screenWidth, screenLayout.screenHeight);
 
+  loadFrames()
+/*
   for (let i = 0; i < totalImages; i++) {
 
         minimapImg[i] = loadImage(`images/planetA/planetAminimap2/planetA_${i}.png`, imageLoaded);
     //    minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`, imageLoaded);
-      }
+      }*/
     
   planet = new BasicMinimap(x = 250, y = 250, diameter = 300, color = 'grey', diameterPlanet = screenLayout.diameterPlanet);
 
@@ -132,7 +168,7 @@ function generateTowers(count) {
 }
 //s
 function preload() {
-  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5j2");
+  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5g");
 
   shared = partyLoadShared("shared", {
     gameObjects: [],  // Start with empty array
@@ -151,15 +187,21 @@ function preload() {
   for (let i = 0; i < totalImages; i++) {
     minimapImg[i] = loadImage(`images/planetA/planetAminimap2/planetA_${i}.png`, imageLoaded);
     //minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`, imageLoaded);
-  }
- */
+  }*/
+ 
   /*
   for (let i = 0; i < 778; i++) {
 
     minimapImg[i] = loadImage(`images/planetA/planetAminimap/planetA_${i}.png`);
   }*/
+    minimapStillImg[0] = loadImage(`images/planetA/planetAminimapImage.png`);
+    minimapStillImg[1] = loadImage(`images/planetA/planetAminimapImage.png`);
+    minimapStillImg[2] = loadImage(`images/planetA/planetAminimapImage.png`);
+    minimapStillImg[3] = loadImage(`images/planetA/planetAminimapImage.png`);
+    minimapStillImg[4] = loadImage(`images/planetA/planetAminimapImage.png`);
+    minimapImageA = loadImage(`images/planetA/planetAminimap2/planetA_624.png`);
 
-  minimapImage = loadImage(`images/bgLavaMinimap.png`);
+    minimapImage = loadImage(`images/bgLavaMinimap.png`);
   //  minimapNightImage = loadImage(`images/background/bgMinimapNight.png`);
   //  minimapHotImage = loadImage(`images/background/bgMinimapHot.png`);
   //  backgroundImage = loadImage("images/background/bgLava3500.png");
@@ -207,7 +249,7 @@ function draw() {
     backgroundStarsManager.show();
   }
 
-  if (detailsLevel.showStarSystem && imagesLoaded === totalImages) {
+  if (detailsLevel.showStarSystem) {
     push();
     angleMode(DEGREES);
 

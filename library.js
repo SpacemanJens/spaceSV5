@@ -398,14 +398,14 @@ class CelestialObject {
 }
 
 class Planet extends CelestialObject {
-  constructor(angle, baseSpeed, distance, tiltEffect, diamterPlanet, color) {
+  constructor(angle, baseSpeed, distance, tiltEffect, diamterPlanet, color, startImageNumber) {
     super(angle, distance, tiltEffect);
     this.baseSpeed = baseSpeed;
     this.baseSize = diamterPlanet / 30;
     this.color = color;
     this.diameterPlanet = diameterPlanet;
     this.size = this.baseSize;
-    this.i = 0;
+    this.i = startImageNumber;
   }
 
   update(speedMultiplier, planetSpeed) {
@@ -415,16 +415,19 @@ class Planet extends CelestialObject {
   draw() {
     if (detailsLevel.showStarPlanetImages) {
 
-      if (frameCount % 3 === 0) {
-        this.i++;
+      if (animationReady) {
+        if (frameCount % 3 === 0) {
+          this.i++;
+        }
+        if (this.i === totalImages) {
+          this.i = 0;
+        }
+        image(minimapImg[this.i], this.x, this.y, this.size, this.size);
+      } else {
+        image(minimapImageA, this.x, this.y, this.size, this.size);
       }
-      if (this.i === totalImages) {
-        this.i = 0;
-      }
-      image(minimapImg[this.i], this.x, this.y, this.size, this.size);
-      //image(minimapImage, this.xMinimap - this.diameterMinimap / 2, this.yMinimap - this.diameterMinimap / 2, this.diameterMinimap, this.diameterMinimap);
-    } else {
 
+    } else {
       fill(this.color[0], this.color[1], this.color[2]);
       noStroke();
       circle(this.x, this.y, this.size);
@@ -496,11 +499,11 @@ class SolarSystem {
     // constructor(angle, baseSpeed, distance, tiltEffect, baseSize, color {
     this.planets = [
       //      new Planet(10, 0.7, 400, 0.05, 40, [0, 102, 204]),
-      new Planet(10, 0.7, 400, 0.05, 1000, [0, 102, 204]),
-      new Planet(90, 0.5, 700, 0.08, 2000, [0, 122, 174]),
-      new Planet(190, 0.4, 1100, 0.04, 3838, [0, 142, 144]),
-      new Planet(270, 0.3, 1400, 0.06, 2500, [0, 162, 114]),
-      new Planet(350, 0.25, 1800, 0.03, 3000, [0, 182, 84])
+      new Planet(10, 0.7, 400, 0.05, 1000, [0, 102, 204], 624),
+      new Planet(90, 0.5, 700, 0.08, 2000, [0, 122, 174], 624),
+      new Planet(190, 0.4, 1100, 0.04, 3838, [0, 142, 144], 624),
+      new Planet(270, 0.3, 1400, 0.06, 2500, [0, 162, 114], 624),
+      new Planet(350, 0.25, 1800, 0.03, 3000, [0, 182, 84], 624)
     ];
 
     this.blackHole = new BlackHole(75, 5);
