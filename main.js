@@ -168,7 +168,7 @@ function generateTowers(count) {
 }
 //s
 function preload() {
-  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5js");
+  partyConnect("wss://p5js-spaceman-server-29f6636dfb6c.herokuapp.com", "jkv-spaceSV5jsL");
 
   shared = partyLoadShared("shared", {
     gameObjects: [],  // Start with empty array
@@ -227,8 +227,10 @@ function draw() {
   stepLocal();
 
   if (partyIsHost()) {
+    console.log("Host action");
     performHostAction()
   } else {
+    console.log("Non Host action");
     receiveNewDataFromHost()
   }
 
